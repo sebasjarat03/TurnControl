@@ -7,6 +7,7 @@ public class Client {
 	private String lastName;
 	private String phone;
 	private String address;
+	private String turn;
 	
 	public Client(String typeId, String id, String name, String lastName, String phone, String address) {
 		this.typeId = typeId;
@@ -15,6 +16,7 @@ public class Client {
 		this.lastName = lastName;
 		this.phone = phone;
 		this.address = address;
+		this.turn = "";
 		
 	}
 
@@ -64,6 +66,13 @@ public class Client {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+	public String getTurn() {
+		return turn;
+	}
+	
+	public void setTurn(String turn) {
+		this.turn = turn;
 	}
 	
 	

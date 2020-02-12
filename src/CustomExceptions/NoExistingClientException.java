@@ -3,7 +3,7 @@ package CustomExceptions;
 @SuppressWarnings("serial")
 public class NoExistingClientException extends Exception{
 	
-	public NoExistingClientException(String id) {
-		super("The client with the id " + id + " does not exists");
+	public NoExistingClientException(String info,String id) {
+		super("The client with the  " + info + ": " + id + " does not exists");
 	}
 }

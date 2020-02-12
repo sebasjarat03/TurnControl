@@ -1,4 +1,5 @@
 package model;
+import java.util.ArrayList;
 
 public class Client {
 	private String typeId;
@@ -7,7 +8,7 @@ public class Client {
 	private String lastName;
 	private String phone;
 	private String address;
-	private String turn;
+	private ArrayList<Turn> turns;
 	
 	public Client(String typeId, String id, String name, String lastName, String phone, String address) {
 		this.typeId = typeId;
@@ -16,7 +17,7 @@ public class Client {
 		this.lastName = lastName;
 		this.phone = phone;
 		this.address = address;
-		this.turn = "";
+		turns = new ArrayList<Turn>();
 		
 	}
 
@@ -67,12 +68,12 @@ public class Client {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public String getTurn() {
-		return turn;
+	public ArrayList<Turn> getTurns() {
+		return turns;
 	}
 	
-	public void setTurn(String turn) {
-		this.turn = turn;
+	public void setTurn(Turn turn) {
+		turns.add(turn);
 	}
 	
 	

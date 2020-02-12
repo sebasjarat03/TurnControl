@@ -6,11 +6,13 @@ public class Control {
 	private String turnToAssign;
 	private String turnToAttend;
 	private ArrayList<Client> clients;
+	private ArrayList<Turn> turns;
 	
 	public Control() {
 		this.turnToAssign = "A00";
 		this.turnToAttend = "A00";
 		clients = new ArrayList<Client>();
+		turns = new ArrayList<Turn>();
 	}
 	
 	public void addClient(String typeId, String id, String name, String lastName, String phone, String address) throws ExistingClientException, EmptyInfoException{
@@ -60,15 +62,19 @@ public class Control {
 	
 	public void registerTurn(String id) throws NoExistingClientException, ClientHasTurnException{
 		if(search(id) == null) {
-			throw new NoExistingClientException(id);
+			throw new NoExistingClientException( "id", id);
 		}
-		else if(!search(id).getTurn().isEmpty()) {
+		if(clientHasPendingTurn(id)) {
 			throw new ClientHasTurnException(id);
 		}
 		else {
-			search(id).setTurn(turnToAssign);
-			this.turnToAssign = nextTurn(turnToAssign);
+			Turn turntemp = new Turn(turnToAssign, Turn.PENDING, search(id));
+			turns.add(turntemp);
+			search(id).setTurn(turntemp);
+			
 		}
+		
+		
 	}
 	
 	public String nextTurn(String turn) {
@@ -96,7 +102,43 @@ public class Control {
 		return clients;
 	}
 	
+	/*public void attendTurn() throws NoExistingClientException{
+		boolean found = false;
+		for (int i = 0; i<clients.size() && !found; i++) {
+			if(clients.get(i).getTurn().equals(turnToAttend)) {
+				found = true;
+			}
+		}
+		
+		if(!found) {
+			throw new NoExistingClientException("turn", turnToAttend);
+		}
+		
+		else {
+			turnToAttend = nextTurn(turnToAttend);
+		}
+		
+	}**/
 	
+	public String getTurnToAttend() {
+		return this.turnToAttend;
+	}
+	
+	public boolean clientHasPendingTurn(String id) {
+		boolean has = false;
+		ArrayList <Turn> temp = search(id).getTurns();
+		if(temp.isEmpty()) {
+			has = false;
+		}
+		else {
+		for(int i = 0; i< temp.size() && !has; i++) {
+			if (temp.get(i).getStatus().equals(Turn.PENDING)) {
+				has = true;
+			}
+		}
+		}
+		return has;
+	}
 	
 	
 	

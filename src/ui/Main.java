@@ -20,6 +20,7 @@ public class Main {
 	public void menu() {
 		int opc = 10;
 		while (opc != 0) {
+			try {
 			System.out.println("Select the option:");
 			System.out.println("1) Add user 		2) Assign turn 		3) Attend turn");
 			System.out.println(" 0) Exit");
@@ -49,7 +50,7 @@ public class Main {
 					control.registerTurn(id);
 					int i = control.getClients().indexOf(control.search(id));
 					
-					System.out.println("The turn " + control.getClients().get(i).getTurn() + " has been assigned correctly to the client " + control.getClients().get(i).getId());
+					System.out.println("The turn "  + " has been assigned correctly to the client " + control.getClients().get(i).getId());
 				}
 				catch(NoExistingClientException nec) {
 					System.out.println(nec.getMessage());
@@ -58,6 +59,17 @@ public class Main {
 					System.out.println(cht.getMessage());
 				}
 				break;
+			
+			case 0:
+				System.out.println("Goodbye!");
+				break;
+			default:
+				System.out.println("Select a correct option");
+				break;
+			}
+		}
+			catch(NumberFormatException nfe) {
+				System.out.println("Input mismatch");
 			}
 		}
 		

@@ -49,14 +49,27 @@ public class Main {
 					System.out.print("Enter the id of the client: "); String id = sc.nextLine();
 					control.registerTurn(id);
 					int i = control.getClients().indexOf(control.search(id));
+					int j = control.getClients().get(i).getTurns().size()-1;
 					
-					System.out.println("The turn "  + " has been assigned correctly to the client " + control.getClients().get(i).getId());
+					System.out.println("The turn " + control.getClients().get(i).getTurns().get(j).getName() + " has been assigned correctly to the client " + control.getClients().get(i).getId());
 				}
 				catch(NoExistingClientException nec) {
 					System.out.println(nec.getMessage());
 				}
 				catch(ClientHasTurnException cht) {
 					System.out.println(cht.getMessage());
+				}
+				break;
+			case 3:
+				try {
+					String turn = control.getTurnToAttend();
+					System.out.println("The client was attended or he left? \n1) Attended \n2) Left");
+					int att = Integer.parseInt(sc.nextLine());
+					control.attendTurn(att);
+					System.out.println("The turn " + turn + " was called successfully" );
+				}
+				catch(NoExistingTurnException net) {
+					System.out.println(net.getMessage());
 				}
 				break;
 			

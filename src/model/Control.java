@@ -71,6 +71,7 @@ public class Control {
 			Turn turntemp = new Turn(turnToAssign, Turn.PENDING, search(id));
 			turns.add(turntemp);
 			search(id).setTurn(turntemp);
+			this.turnToAssign = nextTurn(turnToAssign);
 			
 		}
 		
@@ -102,23 +103,35 @@ public class Control {
 		return clients;
 	}
 	
-	/*public void attendTurn() throws NoExistingClientException{
+	public void attendTurn( int clientStatus) throws NoExistingTurnException{
 		boolean found = false;
-		for (int i = 0; i<clients.size() && !found; i++) {
-			if(clients.get(i).getTurn().equals(turnToAttend)) {
+		Turn temp = null;
+		String cStatus;
+		for(int i = 0; i<turns.size() && !found; i++) {
+			if(turns.get(i).getName().equals(turnToAttend)) {
 				found = true;
+				temp = turns.get(i);
 			}
 		}
 		
 		if(!found) {
-			throw new NoExistingClientException("turn", turnToAttend);
+			throw new NoExistingTurnException(turnToAttend);
 		}
-		
 		else {
-			turnToAttend = nextTurn(turnToAttend);
+			if(clientStatus == 1) {
+				temp.setClientStatus(Turn.ATTENDED);
+			}
+			else {
+				temp.setClientStatus(Turn.LEFT);
+			}
+			temp.setStatus(Turn.CALLED);
+			
+			this.turnToAttend = nextTurn(turnToAttend);
+			
 		}
 		
-	}**/
+		
+	}
 	
 	public String getTurnToAttend() {
 		return this.turnToAttend;

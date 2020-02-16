@@ -85,8 +85,15 @@ public class Control {
 		String msg;
 		
 		if(num == 99) {
-			letter++;
-			num = 00;
+			
+			if(letter == 'Z') {
+				letter = 'A';
+				num = 00;
+			}
+			else {
+				letter++;
+				num = 00;
+			}
 		}
 		else {
 			num++;
@@ -106,7 +113,7 @@ public class Control {
 	public void attendTurn( int clientStatus) throws NoExistingTurnException{
 		boolean found = false;
 		Turn temp = null;
-		String cStatus;
+		
 		for(int i = 0; i<turns.size() && !found; i++) {
 			if(turns.get(i).getName().equals(turnToAttend)) {
 				found = true;
@@ -152,6 +159,19 @@ public class Control {
 		}
 		return has;
 	}
+	
+	public String getTurnToAssign() {
+		return this.turnToAssign;
+	}
+	
+	public void setTurnToAttend(String tta) {
+		this.turnToAttend = tta;
+	}
+	
+	public void setTurnToAssign(String ttass) {
+		this.turnToAssign = ttass;
+	}
+	
 	
 	
 	

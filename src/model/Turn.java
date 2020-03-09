@@ -11,12 +11,14 @@ public class Turn {
 	private String status;
 	private String clientStatus;
 	private Client client;
+	private TurnType type;
 	
-	public Turn(String n, String s, Client c) {
+	public Turn(String n, String s, Client c, TurnType type) {
 		this.name = n;
 		this.status = s;
 		this.client = c;
 		this.clientStatus = "";
+		this.type = type;
 		
 	}
 

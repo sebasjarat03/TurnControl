@@ -1,4 +1,5 @@
 package model;
+import java.time.*;
 import java.util.ArrayList;
 import CustomExceptions.*;
 
@@ -7,12 +8,16 @@ public class Control {
 	private String turnToAttend;
 	private ArrayList<Client> clients;
 	private ArrayList<Turn> turns;
+	private ArrayList<TurnType> turnTypes;
+	private SystemTime systemTime;
 	
 	public Control() {
 		this.turnToAssign = "A00";
 		this.turnToAttend = "A00";
 		clients = new ArrayList<Client>();
 		turns = new ArrayList<Turn>();
+		turnTypes = new ArrayList<TurnType>();
+		systemTime = new SystemTime();
 	}
 	
 	public void addClient(String typeId, String id, String name, String lastName, String phone, String address) throws ExistingClientException, EmptyInfoException{
@@ -60,15 +65,22 @@ public class Control {
 		return temp;
 	}
 	
-	public void registerTurn(String id) throws NoExistingClientException, ClientHasTurnException{
+	public void registerTurn(String id, String turnType) throws NoExistingClientException, ClientHasTurnException, EmptyTypeListException, NoExistingTypeException{
 		if(search(id) == null) {
 			throw new NoExistingClientException( "id", id);
 		}
-		if(clientHasPendingTurn(id)) {
+		else if(clientHasPendingTurn(id)) {
 			throw new ClientHasTurnException(id);
 		}
+		else if(turnTypes.isEmpty()) {
+			throw new EmptyTypeListException();
+		}
+		else if(searchTurnType(turnType)==null) {
+			throw new NoExistingTypeException(turnType);
+		}
 		else {
-			Turn turntemp = new Turn(turnToAssign, Turn.PENDING, search(id));
+			TurnType aux = searchTurnType(turnType);
+			Turn turntemp = new Turn(turnToAssign, Turn.PENDING, search(id), aux);
 			turns.add(turntemp);
 			search(id).setTurn(turntemp);
 			this.turnToAssign = nextTurn(turnToAssign);
@@ -171,6 +183,58 @@ public class Control {
 	public void setTurnToAssign(String ttass) {
 		this.turnToAssign = ttass;
 	}
+	
+	public void addTurnType(String name, float duration) throws  ExistingTurnTypeException, EmptyInfoException  {
+		
+		if(searchTurnType(name)!=null) {
+			throw new ExistingTurnTypeException(name);
+		}
+		else if(name.isEmpty()) {
+			throw new EmptyInfoException("*NAME*");
+		}
+		else if(duration == 0) {
+			throw new EmptyInfoException("*DURATION*");
+		}
+		else {
+			TurnType temp = new TurnType(name, duration);
+			turnTypes.add(temp);
+		}
+		
+		
+	}
+	
+	public TurnType searchTurnType(String name) {
+		TurnType temp = null;
+		boolean found = false;
+		for(int i = 0; i<turnTypes.size() && !found; i++) {
+			if(turnTypes.get(i).getName().equalsIgnoreCase(name)) {
+				temp = turnTypes.get(i);
+				found = true;
+			}
+		}
+		return temp;
+	}
+	
+	public String printTypeList() {
+		String msg = "";
+		for (int i = 0; i < turnTypes.size(); i++) {
+			msg += "\n" + turnTypes.get(i).toString(); 
+		}
+		return msg;
+	}
+	
+	public String showTime() {
+		String msg = "" + systemTime.getTime();
+		
+		return msg;
+	}
+	
+	public void upgradeTime(long time) {
+		LocalDateTime actual = systemTime.getTime2();
+		long seconds = time/1000;
+		systemTime.setTime(actual.plusSeconds(seconds)); 
+	}
+	
 	
 	
 	

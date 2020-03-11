@@ -1,5 +1,7 @@
 package ui;
 import model.*;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import CustomExceptions.*;
 
@@ -28,6 +30,7 @@ public class Main {
 				System.out.println("***********************************************************************************");
 				System.out.println("\nSelect the option:");
 				System.out.println("1) Add user 		2) Assign turn 		3) Add type of turn");
+				System.out.println("4) Update time");
 				System.out.println(" 0) Exit");
 				System.out.println("***********************************************************************************");
 				opc = Integer.parseInt(sc.nextLine());
@@ -76,11 +79,11 @@ public class Main {
 					}
 					break;
 				case 3:
-					System.out.print("\nEnter the name of the type of turn: "); String nType = sc.nextLine();
+					System.out.print("\nEnter the name of the type of turn: "); String nType = sc.nextLine().toUpperCase();
 					System.out.print("Enter the duration of this type of turn: "); float duration = Float.parseFloat(sc.nextLine());
 					try {
 						control.addTurnType(nType, duration);
-						System.out.println("Type added correctly");
+						System.out.println("\nType added correctly");
 					}
 					catch(ExistingTurnTypeException ett) {
 						System.out.println("\n" + ett.getMessage());
@@ -89,8 +92,48 @@ public class Main {
 						System.out.println("\n" + ein.getMessage());
 					}
 					break;
-					
 				case 4:
+					System.out.println("How do you want to update the type?");
+					System.out.println("1) Manually \n2) Taking the time of the system");
+					int opt = Integer.parseInt(sc.nextLine());
+					while(opt!= 1 && opt!=2) {
+						System.out.println("Please enter a valid option");
+						opt = Integer.parseInt(sc.nextLine());
+					}
+						switch(opt) {
+						case 1:
+							System.out.println("Enter the year: "); int year = Integer.parseInt(sc.nextLine());
+							System.out.println("Enter the month: "); int month = Integer.parseInt(sc.nextLine());
+							System.out.println("Enter the day: "); int day = Integer.parseInt(sc.nextLine());
+							System.out.println("Enter the hour: "); int hour = Integer.parseInt(sc.nextLine());
+							System.out.println("Enter the minutes: "); int minutes = Integer.parseInt(sc.nextLine());
+							System.out.println("Enter the seconds: "); int seconds = Integer.parseInt(sc.nextLine());
+							try {
+								control.updateTimeManually(year, month, day, hour, minutes, seconds);
+								System.out.println("Date updated correctly");
+							}
+							catch(DateIsLessException dil) {
+								System.out.println(dil.getMessage());
+							}
+							break;
+						case 2:
+							try {
+								
+								control.updateTimeWithPc(LocalDateTime.now());
+								System.out.println("Date updated correctly");
+							}
+							catch(DateIsLessException dile) {
+								System.out.println(dile.getMessage());
+							}
+							break;
+
+						} 
+						
+					
+					break;
+				
+					
+				case 7:
 					try {
 						String turn = control.getTurnToAttend();
 						System.out.println("\nThe client was attended or he left? \n1) Attended \n2) Left");

@@ -231,10 +231,28 @@ public class Control {
 	
 	public void upgradeTime(long time) {
 		LocalDateTime actual = systemTime.getTime2();
-		long seconds = time/1000;
-		systemTime.setTime(actual.plusSeconds(seconds)); 
+		long nanoSeconds = time*1000000;
+		systemTime.setTime(actual.plusNanos(nanoSeconds)); 
 	}
 	
+	public void updateTimeManually(int y, int mo, int d, int h, int mi, int s) throws DateIsLessException {
+		LocalDateTime newTime = LocalDateTime.of(y, mo, d, h, mi, s);
+		if(systemTime.getTime2().isAfter(newTime)) {
+			throw new DateIsLessException();
+		}
+		else {
+			this.systemTime.setTime(newTime);
+		}
+	}
+	
+	public void updateTimeWithPc(LocalDateTime newTime) throws DateIsLessException {
+		if(systemTime.getTime2().isAfter(newTime)) {
+			throw new DateIsLessException();
+		}
+		else {
+			this.systemTime.setTime(newTime);
+		}
+	}
 	
 	
 	

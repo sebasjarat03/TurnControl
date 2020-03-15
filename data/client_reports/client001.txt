@@ -1,0 +1,3 @@
+
+The client with id 001 has this turns:
+Turn [A00] Status: PENDING - Client Status:  - Type: A

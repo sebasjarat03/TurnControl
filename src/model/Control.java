@@ -11,7 +11,8 @@ public class Control implements Serializable{
 	
 	public final static String CLIENT_REPORT_PATH = "data/client_reports/client";
 	public final static String TURN_REPORT_PATH = "data/turn_reports/turn";
-	
+	public final static String RANDOM_NAMES_PATH = "data/randoms/names.txt";
+	public final static String RANDOM_LASTNAMES_PATH = "data/randoms/lastnames.txt";
 	
 	private String turnToAssign;
 	private String turnToAttend;
@@ -84,7 +85,7 @@ public class Control implements Serializable{
 		else if(turnTypes.isEmpty()) {
 			throw new EmptyTypeListException();
 		}
-		else if(turnType<0 || turnType>0) {
+		else if(turnType<0 | turnType>=turnTypes.size()) {
 			throw new InvalidTypeException();
 		}
 		else {
@@ -96,6 +97,41 @@ public class Control implements Serializable{
 			else {
 				LocalDateTime auxTime = turns.get(turns.size()-1).getTimeOfFinish();
 				startingTime = (systemTime.getTime2().isAfter(auxTime)) ? systemTime.getTime2() : auxTime;
+			}
+			
+			TurnType aux = turnTypes.get(turnType);
+			Turn turnTemp = new Turn(turnToAssign, Turn.PENDING, search(id), aux, startingTime);
+			turns.add(turnTemp);
+			search(id).setTurn(turnTemp);
+			this.turnToAssign = nextTurn(turnToAssign);
+			
+		}
+		
+		
+	}
+	
+	public void registerTurn(String id, int turnType, LocalDateTime time) throws NoExistingClientException, ClientHasTurnException, EmptyTypeListException, InvalidTypeException{
+		if(search(id) == null) {
+			throw new NoExistingClientException( "id", id);
+		}
+		else if(clientHasPendingTurn(id)) {
+			throw new ClientHasTurnException(id);
+		}
+		else if(turnTypes.isEmpty()) {
+			throw new EmptyTypeListException();
+		}
+		else if(turnType<0 || turnType>0) {
+			throw new InvalidTypeException();
+		}
+		else {
+			LocalDateTime startingTime;
+			
+			if(turns.size()<1) {
+				startingTime = time;
+			}
+			else {
+				LocalDateTime auxTime = turns.get(turns.size()-1).getTimeOfFinish();
+				startingTime = (time.isAfter(auxTime)) ? time : auxTime;
 			}
 			
 			TurnType aux = turnTypes.get(turnType);
@@ -287,7 +323,7 @@ public class Control implements Serializable{
 					else if(clientStatus == 2) {
 						turns.get(i).setClientStatus(Turn.LEFT);
 					}
-					msg += "\nTurn " + turns.get(i).getName() + " type(" + turns.get(i).getTurnType().getName() + ") was attended";
+					msg += "\nTurn " + turns.get(i).getName() + " type(" + turns.get(i).getTurnType().getName() + ") was attended at " + turns.get(i).getTimeToStart().toString();
 					turnToAttend = nextTurn(turnToAttend);
 					}
 					
@@ -369,7 +405,115 @@ public class Control implements Serializable{
 		
 	}
 	
+	public void generateRandomClients(int quantity) throws IOException {
+		ArrayList<String> names = new ArrayList<String>();
+		ArrayList<String> lastNames = new ArrayList<String>();
+		String[] idTypes = new String[] {"TI","CC", "CE", "PP"};
+		
+		BufferedReader br = new BufferedReader(new FileReader(RANDOM_NAMES_PATH));
+		String line = br.readLine();
+		
+		int y = 0;
+		while(line!=null) {
+			y++;
+			
+			names.add(line);
+			line = br.readLine();
+			
+		}
+		
+		br = new BufferedReader(new FileReader(RANDOM_LASTNAMES_PATH));
+		line = br.readLine();
+		int q = 0;
+		while(line!=null && q<=y) {
+			
+			lastNames.add(line);
+			br.readLine();
+			
+			q++;
+			
+		}
+		br.close();
+		
+		String[] rNames = new String[quantity];
+		String[] rLastNames = new String[quantity];
+		String[] rIdTypes = new String[quantity];
+		for (int i = 0; i < quantity; i++) {
+			for (int j = 0; j < quantity; j++) {
+				int idx = (int)Math.random()*100;
+				String n = names.get(idx);
+				rNames[j] = n; 
+			}
+			for (int j = 0; j < quantity; j++) {
+				int idx = (int)Math.random()*100;
+				String ln = lastNames.get(idx);
+				rLastNames[j] = ln; 
+			}
+			for (int j = 0; j < quantity; j++) {
+				int idx = (int)Math.random()*4;
+				String idType = idTypes[idx];
+				rIdTypes[j] = idType; 
+			}
+		}
+		for (int i = 0; i < quantity; i++) {
+			String idType = rIdTypes[i];
+			String id = "00" + (i+1);
+			String name = rNames[i];
+			String lastName = rLastNames[i];
+			String phone = "N/A";
+			String address = "N/A";
+			clients.add(new Client(idType, id, name, lastName, phone, address));
+		}
+	}
 	
+	public void generateRandomTurns(int turnsByDay, int days) throws NoExistingClientException, ClientHasTurnException, EmptyTypeListException, InvalidTypeException {
+		ArrayList<Client> clientsWithoutTurns = getClientsWithoutTurn();
+		int totTurns = turnsByDay*days;
+		if(clientsWithoutTurns.isEmpty()) {
+			throw new NoExistingClientException("There are no clients without turn");
+		}
+		else if(clientsWithoutTurns.size()<totTurns) {
+			throw new NoExistingClientException("There are no enough clients ("+ clientsWithoutTurns.size() +") for this number of turns (" + totTurns + ")");
+		}
+		
+		int idx = 0;
+		LocalDateTime auxTime = systemTime.getTime2();
+		for (int i = 0; i < days; i++) {
+			for (int j = 0; j < turnsByDay; j++) {
+				Client temp = clientsWithoutTurns.get(idx);
+				int turnTypeIdx = (int) Math.random()*turnTypes.size();
+				registerTurn(temp.getId(), turnTypeIdx, auxTime);
+				idx++;
+			}
+			auxTime = auxTime.plusDays(1);
+		}
+		
+	}
+	
+	public ArrayList<Client> getClientsWithoutTurn(){
+		ArrayList<Client> temp = new ArrayList<Client>();
+		for (int i = 0; i < clients.size(); i++) {
+			ArrayList<Turn> tempTurns = clients.get(i).getTurns();
+			if(clients.get(i).getTurns().isEmpty()) {
+				
+				temp.add(clients.get(i));
+			}
+			else if(clients.get(i).getTurns().get(tempTurns.size()-1).getStatus().equals(Turn.CALLED)) {
+				temp.add(clients.get(i));
+			}
+			
+			
+		}
+		return temp;
+	}
+	
+	public ArrayList<TurnType> getTurnTypes(){
+		return turnTypes;
+	}
+	
+	public SystemTime getSystemTime() {
+		return systemTime;
+	}
 	
 	
 	

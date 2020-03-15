@@ -36,7 +36,7 @@ public class Main {
 				System.out.println("1) Add user 			2) Assign turn 			3) Add type of turn");
 				System.out.println("4) Update time          	5) Attend turns			6) Save all");
 				System.out.println("7) Load all			8) Generate client reports 	9) Generate turn reports");
-				System.out.println("10) Generate random clients	11)Generate Random turns");
+				System.out.println("10) Generate random clients	11)Generate Random turns	12) Print a sorted list of existing clients");
 				System.out.println(" 0) Exit");
 				System.out.println("***********************************************************************************");
 				opc = Integer.parseInt(sc.nextLine());
@@ -291,6 +291,25 @@ public class Main {
 					timeB = System.currentTimeMillis();
 					totalDur = timeB - timeA;
 					System.out.println("Duration of this operation in milliseconds: " + totalDur);
+					break;
+				case 12:
+					System.out.println(" 1) Sort by ID \n2) Sort by Name and LastName");
+					int opti = Integer.parseInt(sc.nextLine());
+					while(opti!= 1 && opti!=2) {
+						System.out.println("Please enter a valid option");
+						opt = Integer.parseInt(sc.nextLine());
+					}
+					switch (opti){
+					case 1:
+						System.out.println(control.sortClientsById());
+						break;
+					case 2: 
+						System.out.println(control.sortClientsByNameAndLastName());
+						break;
+					default:
+						System.out.println("invalid option");
+						break;
+					}
 					break;
 			
 

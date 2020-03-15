@@ -2,7 +2,7 @@ package model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Client implements Serializable{
+public class Client implements Serializable, Comparable<Client>{
 	private String typeId;
 	private String id;
 	private String name;
@@ -82,5 +82,24 @@ public class Client implements Serializable{
 		return msg;
 	}
 	
+	public int compareTo(Client c) {
+		if(name.compareToIgnoreCase(c.name) < 0) {
+			return -1;
+		}
+		else if(name.compareToIgnoreCase(c.name) > 0) {
+			return 1;
+		}
+		else {
+			if(lastName.compareToIgnoreCase(c.lastName) < 0) {
+				return -1;
+			}
+			else if(lastName.compareToIgnoreCase(c.lastName) > 0) {
+				return 1;
+			}
+			else {
+				return 0;
+			}
+		}
+	}
 
 }

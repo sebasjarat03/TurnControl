@@ -242,7 +242,20 @@ public class Control implements Serializable{
 		return temp;
 	}
 	
+	public void sortTurnTypesByName() {
+		for(int i = 1; i < turnTypes.size(); i++) {
+			TurnType temp = turnTypes.get(i);
+			int j = i - 1;
+			while(j >= 0 && turnTypes.get(j).getName().compareTo(temp.getName()) > 0) {
+				turnTypes.set(j + 1, turnTypes.get(j));
+				j--;
+			}
+			turnTypes.set(j + 1, temp);
+		}
+	}
+	
 	public String printTypeList() {
+		sortTurnTypesByName();
 		String msg = "";
 		for (int i = 0; i < turnTypes.size(); i++) {
 			msg += "\n"+ (i+1) + ") " + turnTypes.get(i).toString(); 
@@ -410,56 +423,50 @@ public class Control implements Serializable{
 		ArrayList<String> lastNames = new ArrayList<String>();
 		String[] idTypes = new String[] {"TI","CC", "CE", "PP"};
 		
-		BufferedReader br = new BufferedReader(new FileReader(RANDOM_NAMES_PATH));
-		String line = br.readLine();
+		BufferedReader br1 = new BufferedReader(new FileReader(RANDOM_NAMES_PATH));
+		String line = br1.readLine();
 		
-		int y = 0;
+		
 		while(line!=null) {
-			y++;
-			
 			names.add(line);
-			line = br.readLine();
+			line = br1.readLine();
 			
 		}
+		br1.close();
 		
-		br = new BufferedReader(new FileReader(RANDOM_LASTNAMES_PATH));
-		line = br.readLine();
-		int q = 0;
-		while(line!=null && q<=y) {
-			
-			lastNames.add(line);
-			br.readLine();
-			
-			q++;
+		BufferedReader br2 = new BufferedReader(new FileReader(RANDOM_LASTNAMES_PATH));
+		String line2 = br2.readLine();
+		
+		while(line2!=null) {
+			lastNames.add(line2);
+			line2 = br2.readLine();
 			
 		}
-		br.close();
+		br2.close();
 		
-		String[] rNames = new String[quantity];
-		String[] rLastNames = new String[quantity];
-		String[] rIdTypes = new String[quantity];
-		for (int i = 0; i < quantity; i++) {
-			for (int j = 0; j < quantity; j++) {
-				int idx = (int)Math.random()*100;
-				String n = names.get(idx);
-				rNames[j] = n; 
-			}
-			for (int j = 0; j < quantity; j++) {
-				int idx = (int)Math.random()*100;
-				String ln = lastNames.get(idx);
-				rLastNames[j] = ln; 
-			}
-			for (int j = 0; j < quantity; j++) {
-				int idx = (int)Math.random()*4;
-				String idType = idTypes[idx];
-				rIdTypes[j] = idType; 
-			}
+		
+		String[][] temps = new String[3][quantity];
+
+		for(int i = 0; i < temps[0].length; i++) {
+			int index =(int)(Math.random()*100);
+			String na = names.get(index);
+			temps[0][i] = na;
+		}
+		for(int i = 0; i < temps[1].length; i++) {
+			int index =(int)(Math.random()*100);
+			String su = lastNames.get(index);
+			temps[1][i] = su;
+		}
+		for(int i = 0; i < temps[2].length; i++) {
+			int index =(int)(Math.random()*4);
+			String id = idTypes[index];
+			temps[2][i] = id;
 		}
 		for (int i = 0; i < quantity; i++) {
-			String idType = rIdTypes[i];
+			String idType = temps[2][i];
 			String id = "00" + (i+1);
-			String name = rNames[i];
-			String lastName = rLastNames[i];
+			String name = temps[0][i];
+			String lastName = temps[1][i];
 			String phone = "N/A";
 			String address = "N/A";
 			clients.add(new Client(idType, id, name, lastName, phone, address));
@@ -515,7 +522,51 @@ public class Control implements Serializable{
 		return systemTime;
 	}
 	
+	public String sortClientsById() {
+		if(!clients.isEmpty()) {
+			for(int i = 0; i < clients.size() - 1; i++) {
+				int min = i;
+				for(int j = i + 1; j < clients.size(); j++) {
+					if(clients.get(j).getId().compareTo(clients.get(min).getId()) < 0) {
+						min = j;
+					}
+				}
+				Client temp = clients.get(min);
+				clients.set(min, clients.get(i));
+				clients.set(i, temp);
+			}
+			String msg = "";
+			for(int i = 0; i < clients.size(); i++) {
+				msg += clients.get(i).toString() + "\n";
+			}
+			return msg;
+		}
+		else {
+			return "There are not users created";
+		}
+	}
 	
+	public String sortClientsByNameAndLastName() {
+		if(!clients.isEmpty()) {
+			for(int i = 0; i < clients.size() - 1; i++) {
+				for(int j = 0; j < clients.size() - i - 1; j++) {
+					if(clients.get(j).compareTo(clients.get(j + 1)) > 0) {
+						Client temp = clients.get(j);
+						clients.set(j, clients.get(j + 1));
+						clients.set(j + 1, temp);
+					}
+				}
+			}
+			String msg = "";
+			for(int i = 0; i < clients.size(); i++) {
+				msg += clients.get(i).toString() + "\n";
+			}
+			return msg;
+		}
+		else {
+			return "There are not users created";
+		}
+	}
 	
 	
 	

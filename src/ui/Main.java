@@ -32,9 +32,9 @@ public class Main {
 				System.out.println(control.showTime());
 				System.out.println("***********************************************************************************");
 				System.out.println("\nSelect the option:");
-				System.out.println("1) Add user 		2) Assign turn 		3) Add type of turn");
-				System.out.println("4) Update time       5) Attend turns		6) Save all");
-				System.out.println("7) Load all");
+				System.out.println("1) Add user 		2) Assign turn 			3) Add type of turn");
+				System.out.println("4) Update time          5) Attend turns			6) Save all");
+				System.out.println("7) Load all		8) Generate client reports 	9) Generate turn reports");
 				System.out.println(" 0) Exit");
 				System.out.println("***********************************************************************************");
 				opc = Integer.parseInt(sc.nextLine());
@@ -60,9 +60,10 @@ public class Main {
 				case 2:
 					try {
 						System.out.print("\nEnter the id of the client: "); String id = sc.nextLine();
-						System.out.println("\nEnter the name of the type of turn from this list: ");
+						System.out.println("\nSelect the type of turn from this list: ");
 						System.out.println(control.printTypeList());
-						String type = sc.nextLine().toUpperCase();
+						int type = Integer.parseInt(sc.nextLine().toUpperCase());
+						type--;
 						control.registerTurn(id, type);
 						int i = control.getClients().indexOf(control.search(id));
 						int j = control.getClients().get(i).getTurns().size()-1;
@@ -78,8 +79,8 @@ public class Main {
 					catch(EmptyTypeListException etl) {
 						System.out.println("\n" + etl.getMessage());
 					}
-					catch(NoExistingTypeException net) {
-						System.out.println("\n" + net.getMessage());
+					catch(InvalidTypeException it) {
+						System.out.println("\n" + it.getMessage());
 					}
 					break;
 				case 3:
@@ -174,6 +175,39 @@ public class Main {
 					}
 					catch(ClassNotFoundException cnf) {
 						System.out.println(cnf.getMessage());
+					}
+					catch(IOException e) {
+						System.out.println(e.getMessage());
+					}
+					break;
+				case 8:
+					System.out.println("Enter the client id: "); String clientId = sc.nextLine();
+					System.out.println("How do you want the report?");
+					System.out.println("1) File \n2) Console");
+					int option = Integer.parseInt(sc.nextLine());
+					try {
+						System.out.println(control.generateClientReport(clientId, option));
+					}
+					catch(NoExistingClientException nec) {
+						System.out.println(nec.getMessage());
+					}
+					catch(FileNotFoundException fnf) {
+						System.out.println("File not found");
+					}
+					catch(IOException e) {
+						System.out.println(e.getMessage());
+					}
+					break;
+				case 9:
+					System.out.println("Enter the turn name: "); String turnName = sc.nextLine().toUpperCase();
+					System.out.println("How do you want the report?");
+					System.out.println("1) File \n2) Console");
+					int op = Integer.parseInt(sc.nextLine());
+					try {
+						System.out.println(control.generateTurnReport(turnName, op));
+					}
+					catch(FileNotFoundException fnf) {
+						System.out.println("File not found");
 					}
 					catch(IOException e) {
 						System.out.println(e.getMessage());

@@ -1,12 +1,16 @@
 package model;
-import java.io.Serializable;
+import java.io.*;
 import java.time.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
 import CustomExceptions.*;
 
 public class Control implements Serializable{
+	
+	public final static String CLIENT_REPORT_PATH = "data/client_reports/client";
+	public final static String TURN_REPORT_PATH = "data/turn_reports/turn";
 	
 	
 	private String turnToAssign;
@@ -70,7 +74,7 @@ public class Control implements Serializable{
 		return temp;
 	}
 	
-	public void registerTurn(String id, String turnType) throws NoExistingClientException, ClientHasTurnException, EmptyTypeListException, NoExistingTypeException{
+	public void registerTurn(String id, int turnType) throws NoExistingClientException, ClientHasTurnException, EmptyTypeListException, InvalidTypeException{
 		if(search(id) == null) {
 			throw new NoExistingClientException( "id", id);
 		}
@@ -80,8 +84,8 @@ public class Control implements Serializable{
 		else if(turnTypes.isEmpty()) {
 			throw new EmptyTypeListException();
 		}
-		else if(searchTurnType(turnType)==null) {
-			throw new NoExistingTypeException(turnType);
+		else if(turnType<0 || turnType>0) {
+			throw new InvalidTypeException();
 		}
 		else {
 			LocalDateTime startingTime;
@@ -94,9 +98,8 @@ public class Control implements Serializable{
 				startingTime = (systemTime.getTime2().isAfter(auxTime)) ? systemTime.getTime2() : auxTime;
 			}
 			
-			TurnType aux = searchTurnType(turnType);
+			TurnType aux = turnTypes.get(turnType);
 			Turn turnTemp = new Turn(turnToAssign, Turn.PENDING, search(id), aux, startingTime);
-			System.out.println(startingTime);
 			turns.add(turnTemp);
 			search(id).setTurn(turnTemp);
 			this.turnToAssign = nextTurn(turnToAssign);
@@ -206,7 +209,7 @@ public class Control implements Serializable{
 	public String printTypeList() {
 		String msg = "";
 		for (int i = 0; i < turnTypes.size(); i++) {
-			msg += "\n" + turnTypes.get(i).toString(); 
+			msg += "\n"+ (i+1) + ") " + turnTypes.get(i).toString(); 
 		}
 		return msg;
 	}
@@ -299,6 +302,68 @@ public class Control implements Serializable{
 		}
 		if(msg.isEmpty()) {
 			msg += "No turns attended";
+		}
+		return msg;
+		
+	}
+	
+	public String generateClientReport(String clientId, int option) throws NoExistingClientException, IOException {
+		String msg = "";
+		Client temp = search(clientId);
+		if(temp == null) {
+			throw new NoExistingClientException("ID", clientId);
+		}
+		else {
+			msg += "\nThe client with id " + clientId + " has this turns:";
+			ArrayList<Turn> aux = temp.getTurns();
+			for (int i = 0; i < aux.size(); i++) {
+				msg+= "\n" +  aux.get(i).toString();
+			}
+		}
+		if(msg.isEmpty()) {
+			msg += "This client does not has any turn";
+		}
+		else if(option == 1) {
+			BufferedWriter bw = new BufferedWriter(new FileWriter((CLIENT_REPORT_PATH + clientId + ".txt")));
+			bw.write("" + msg);
+			bw.close();
+			msg = "The report was saved at this path: " + CLIENT_REPORT_PATH + clientId + ".txt";
+		}
+		else if (option==2){
+			
+		}
+		else {
+			msg = option + " is not a correct option";
+		}
+		return msg;
+	}
+	
+	public String generateTurnReport(String turnName, int option) throws IOException {
+		String msg = "";
+		
+		for (int i = 0; i < clients.size(); i++) {
+			ArrayList<Turn> tempList = clients.get(i).getTurns();
+			for (int j = 0; j < tempList.size(); j++) {
+				if(tempList.get(j).getName().equals(turnName)) {
+					msg += clients.get(i).toString();
+				}
+			}
+		}
+		
+		if(msg.isEmpty()) {
+			msg = "Any client has this turn";
+		}
+		else if (option==1) {
+			BufferedWriter bw = new BufferedWriter(new FileWriter((TURN_REPORT_PATH + turnName + ".txt")));
+			bw.write("" + msg);
+			bw.close();
+			msg = "The report was saved at this path: " + TURN_REPORT_PATH + turnName + ".txt";
+		}
+		else if (option==2){
+			
+		}
+		else {
+			msg = option + " is not a correct option";
 		}
 		return msg;
 		

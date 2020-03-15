@@ -77,6 +77,10 @@ public class Client implements Serializable{
 		turns.add(turn);
 	}
 	
+	public String toString() {
+		String msg = "[Name]: " + name + " [Lastname]: " + lastName + " [Type of ID]: " + typeId + " [ID]: " + id + " [Phone number]: " + phone + " [Address]: " + address;
+		return msg;
+	}
 	
 
 }

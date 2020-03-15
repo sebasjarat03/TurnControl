@@ -72,6 +72,11 @@ public class Turn implements Serializable{
 		
 		return temp;
 	}
+	
+	public String toString() {
+		String msg = "Turn [" + name + "] Status: " + status + " - Client Status: " + clientStatus + " - Type: " + type.getName();
+		return msg;
+	}
 
 	
 	

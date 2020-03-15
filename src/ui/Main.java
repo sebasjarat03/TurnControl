@@ -37,6 +37,7 @@ public class Main {
 				System.out.println("4) Update time          	5) Attend turns			6) Save all");
 				System.out.println("7) Load all			8) Generate client reports 	9) Generate turn reports");
 				System.out.println("10) Generate random clients	11)Generate Random turns	12) Print a sorted list of existing clients");
+				System.out.println("13) Search a turn to know if exists");
 				System.out.println(" 0) Exit");
 				System.out.println("***********************************************************************************");
 				opc = Integer.parseInt(sc.nextLine());
@@ -301,15 +302,36 @@ public class Main {
 					}
 					switch (opti){
 					case 1:
+						timeA = System.currentTimeMillis();
 						System.out.println(control.sortClientsById());
+						timeB= System.currentTimeMillis();
+						totalDur = timeB -timeA;
+						System.out.println("Duration of this operation in milliseconds: " + totalDur);
 						break;
 					case 2: 
+						timeA = System.currentTimeMillis();
 						System.out.println(control.sortClientsByNameAndLastName());
+						timeB= System.currentTimeMillis();
+						totalDur = timeB -timeA;
+						System.out.println("Duration of this operation in milliseconds: " + totalDur);
 						break;
 					default:
 						System.out.println("invalid option");
 						break;
 					}
+					break;
+				case 13:
+					System.out.println("Enter the name of the turn:"); String tn = sc.nextLine().toUpperCase();
+					timeA = System.currentTimeMillis();
+					try {
+						System.out.println(control.binarySearchTurn(tn).toString());
+					}
+					catch(NullPointerException e) {
+						System.out.println("The turn does not exists");
+					}
+					timeB= System.currentTimeMillis();
+					totalDur = timeB -timeA;
+					System.out.println("Duration of this operation in milliseconds: " + totalDur);
 					break;
 			
 

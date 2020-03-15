@@ -7,7 +7,7 @@ import CustomExceptions.*;
 import java.io.*;
 
 public class Main {
-	public static final String SAVE_MODEL_PATH = "data/saves/model.sbjt";
+	public static final String SAVE_MODEL_PATH = "data/saves/model_saved.sbjt";
 	public Scanner sc;
 	public Control control;
 	

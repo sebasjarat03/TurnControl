@@ -1,8 +1,9 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class TurnType {
+public class TurnType implements Serializable{
 	
 	private String name;
 	private float duration;

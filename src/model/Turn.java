@@ -1,8 +1,9 @@
 package model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Turn {
+public class Turn implements Serializable{
 	public static final String PENDING = "PENDING";
 	public static final String CALLED = "CALLED";
 	public static final String ATTENDED = "ATTENDED";

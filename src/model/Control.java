@@ -1,11 +1,12 @@
 package model;
+import java.io.Serializable;
 import java.time.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import CustomExceptions.*;
 
-public class Control {
+public class Control implements Serializable{
 	
 	
 	private String turnToAssign;

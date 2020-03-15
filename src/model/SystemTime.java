@@ -1,7 +1,8 @@
 package model;
+import java.io.Serializable;
 import java.time.*;
 
-public class SystemTime {
+public class SystemTime implements Serializable{
 	private LocalDateTime inDateTime;
 	
 	public SystemTime() {

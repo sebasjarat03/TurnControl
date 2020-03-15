@@ -4,10 +4,13 @@ import model.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import CustomExceptions.*;
+import java.io.*;
 
 public class Main {
+	public static final String SAVE_MODEL_PATH = "data/saves/model.sbjt";
 	public Scanner sc;
 	public Control control;
+	
 
 	public static void main(String args[]) {
 		Main main = new Main();
@@ -30,7 +33,8 @@ public class Main {
 				System.out.println("***********************************************************************************");
 				System.out.println("\nSelect the option:");
 				System.out.println("1) Add user 		2) Assign turn 		3) Add type of turn");
-				System.out.println("4) Update time");
+				System.out.println("4) Update time       5) Attend turns		6) Save all");
+				System.out.println("7) Load all");
 				System.out.println(" 0) Exit");
 				System.out.println("***********************************************************************************");
 				opc = Integer.parseInt(sc.nextLine());
@@ -133,23 +137,49 @@ public class Main {
 					break;
 				
 					
-				case 7:
+				case 5:
+					System.out.println("Attending the turns until this time...");
 					try {
-						String turn = control.getTurnToAttend();
-						System.out.println("\nThe client was attended or he left? \n1) Attended \n2) Left");
-
-						int att = Integer.parseInt(sc.nextLine());
-						while(att!=1 && att!=2) {
-							System.out.println("Please enter a valid option: ");
-							att = Integer.parseInt(sc.nextLine());
-						}
-						control.attendTurn(att);
-						System.out.println("\nThe turn " + turn + " was called successfully" );
+						System.out.println(control.attendTurn());
 					}
 					catch(NoExistingTurnException net) {
-						System.out.println("\n" + net.getMessage());
+						System.out.println(net.getMessage());
+					}
+					
+					break;
+				case 6:
+					try {
+						ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(SAVE_MODEL_PATH));
+						oos.writeObject(control);
+						oos.close();
+						System.out.println("All was saved correctly");
+					}
+					catch(FileNotFoundException e) {
+						System.out.println(e.getMessage());
+					}
+					catch(IOException e) {
+						System.out.println("Error saving");
+						System.out.println(e.getMessage());
 					}
 					break;
+				case 7:
+					try {
+						ObjectInputStream ois = new ObjectInputStream(new FileInputStream(SAVE_MODEL_PATH));
+						control = (Control) ois.readObject();
+						ois.close();
+						System.out.println("All was loaded correctly");
+					}
+					catch(FileNotFoundException fnf) {
+						System.out.println(fnf.getMessage());
+					}
+					catch(ClassNotFoundException cnf) {
+						System.out.println(cnf.getMessage());
+					}
+					catch(IOException e) {
+						System.out.println(e.getMessage());
+					}
+					break;
+			
 
 				case 0:
 					System.out.println("\nGoodbye!");

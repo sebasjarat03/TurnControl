@@ -1,9 +1,13 @@
 package model;
 import java.time.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import CustomExceptions.*;
 
 public class Control {
+	
+	
 	private String turnToAssign;
 	private String turnToAttend;
 	private ArrayList<Client> clients;
@@ -79,10 +83,21 @@ public class Control {
 			throw new NoExistingTypeException(turnType);
 		}
 		else {
+			LocalDateTime startingTime;
+			
+			if(turns.size()<1) {
+				startingTime = systemTime.getTime2();
+			}
+			else {
+				LocalDateTime auxTime = turns.get(turns.size()-1).getTimeOfFinish();
+				startingTime = (systemTime.getTime2().isAfter(auxTime)) ? systemTime.getTime2() : auxTime;
+			}
+			
 			TurnType aux = searchTurnType(turnType);
-			Turn turntemp = new Turn(turnToAssign, Turn.PENDING, search(id), aux);
-			turns.add(turntemp);
-			search(id).setTurn(turntemp);
+			Turn turnTemp = new Turn(turnToAssign, Turn.PENDING, search(id), aux, startingTime);
+			System.out.println(startingTime);
+			turns.add(turnTemp);
+			search(id).setTurn(turnTemp);
 			this.turnToAssign = nextTurn(turnToAssign);
 			
 		}
@@ -122,35 +137,7 @@ public class Control {
 		return clients;
 	}
 	
-	public void attendTurn( int clientStatus) throws NoExistingTurnException{
-		boolean found = false;
-		Turn temp = null;
-		
-		for(int i = 0; i<turns.size() && !found; i++) {
-			if(turns.get(i).getName().equals(turnToAttend)) {
-				found = true;
-				temp = turns.get(i);
-			}
-		}
-		
-		if(!found) {
-			throw new NoExistingTurnException(turnToAttend);
-		}
-		else {
-			if(clientStatus == 1) {
-				temp.setClientStatus(Turn.ATTENDED);
-			}
-			else {
-				temp.setClientStatus(Turn.LEFT);
-			}
-			temp.setStatus(Turn.CALLED);
-			
-			this.turnToAttend = nextTurn(turnToAttend);
-			
-		}
-		
-		
-	}
+	
 	
 	public String getTurnToAttend() {
 		return this.turnToAttend;
@@ -253,6 +240,72 @@ public class Control {
 			this.systemTime.setTime(newTime);
 		}
 	}
+	
+	
+	
+	public Turn binarySearchTurn(String n) {
+		int low = 0;
+		int high = turns.size()-1;
+		boolean found = false;
+		Turn temp = null;
+		while(low<=high && !found) {
+			int mid = (low+high) / 2;
+			
+			if(n.compareTo(turns.get(mid).getName())>0) {
+				low = mid +1;
+			}
+			else if(n.compareTo(turns.get(mid).getName())<0) {
+				high = mid - 1;
+			}
+			else {
+				temp = turns.get(mid);
+				found=true;
+			}
+		}
+		return temp;
+	}
+	
+	public String attendTurn() throws NoExistingTurnException {
+		String msg  = "";
+		boolean stop = false;
+		for (int i = 0; i < turns.size() && !stop ; i++) {
+			if(turns.get(i)==null) {
+				throw new NoExistingTurnException(turnToAttend);
+			}
+			else {
+				if(turns.get(i).getTimeToStart().isBefore(systemTime.getTime2()) ) {
+					if(turns.get(i).getStatus().equals(Turn.PENDING)) {
+					int clientStatus = (int)Math.random()*(1-2)+2;
+					turns.get(i).setStatus(Turn.CALLED);
+					if(clientStatus == 1) {
+						turns.get(i).setClientStatus(Turn.ATTENDED);
+					}
+					else if(clientStatus == 2) {
+						turns.get(i).setClientStatus(Turn.LEFT);
+					}
+					msg += "\nTurn " + turns.get(i).getName() + " type(" + turns.get(i).getTurnType().getName() + ") was attended";
+					turnToAttend = nextTurn(turnToAttend);
+					}
+					
+				}
+				else {
+					stop = true;
+				}
+				
+				
+				
+			}
+		}
+		if(msg.isEmpty()) {
+			msg += "No turns attended";
+		}
+		return msg;
+		
+	}
+	
+	
+	
+	
 	
 	
 	
